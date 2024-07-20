@@ -29,7 +29,6 @@ public class TaskUIController {
     static final String TASK_URL = "/ui/tasks";
 
     private final TaskService service;
-    private final AttachmentRepository attachmentRepository;
     private final Handlers.ActivityHandler activityHandler;
     private final Handlers.AttachmentHandler attachmentHandler;
     private final Handlers.TaskHandler taskHandler;
@@ -85,8 +84,10 @@ public class TaskUIController {
                     activityHandler.getMapper().toToList(activityHandler.getRepository().findAllByTaskIdOrderByUpdatedDesc(taskTo.getId()));
             List<ActivityTo> comments = getComments(activityTos);
             activityTos.removeAll(comments);
+            Set<String> tags = service.getTags(taskTo.getId());
             model.addAttribute("comments", comments);
             model.addAttribute("activities", activityTos);
+            model.addAttribute("tags", tags);
             if (!taskTo.isNew()) {
                 model.addAttribute("attachs", attachmentHandler.getRepository().getAllForObject(taskTo.id(), ObjectType.TASK));
             }
@@ -109,6 +110,7 @@ public class TaskUIController {
         taskTo.getActivityTos().removeAll(comments);
         model.addAttribute("task", taskTo);
         model.addAttribute("comments", comments);
+        model.addAttribute("tags", taskTo.getTags());
         model.addAttribute("attachs", attachmentHandler.getRepository().getAllForObject(taskTo.id(), ObjectType.TASK));
         model.addAttribute("activities", taskTo.getActivityTos());
     }

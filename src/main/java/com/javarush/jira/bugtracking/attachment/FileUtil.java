@@ -27,7 +27,7 @@ public class FileUtil {
             Files.createFile(path);
             Files.copy(multipartFile.getInputStream(), path);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalRequestDataException("Failed to upload file" + multipartFile.getOriginalFilename());
         }
     }
 
