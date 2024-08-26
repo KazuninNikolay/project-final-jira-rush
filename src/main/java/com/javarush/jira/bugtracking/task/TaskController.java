@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static com.javarush.jira.common.BaseHandler.createdResponse;
 
@@ -156,4 +157,24 @@ public class TaskController {
             this(taskTo, new LinkedList<>());
         }
     }
+
+    @GetMapping(value = "/{id}/tags")
+    public Set<String> getTags(@PathVariable long id) {
+       return taskService.getTags(id);
+    }
+
+    @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public Task createTag(@Valid @RequestBody String tag,
+                            @PathVariable long id) {
+        return taskService.createTag(tag, id);
+    }
+
+    @DeleteMapping(value = "/{id}/tags")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTag(@PathVariable long id,
+                          @RequestBody String tag) {
+        taskService.deleteTag(tag, id);
+    }
+
 }

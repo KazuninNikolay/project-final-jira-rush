@@ -37,6 +37,21 @@
             </div>
         </div>
 
+        <!--Tags-->
+        <div th:if="${!tags.isEmpty()}">
+            <hr>
+            <h5 class="fw-bold text-secondary ms-1" th:if="${!tags.isEmpty()}">Tags</h5>
+            <div class="scroll-area">
+                <div th:each="tag : ${tags}">
+                    <div class="card bg-light mb-2 me-2">
+                        <div class="card-body py-2">
+                            <div class="fw-bold" th:text="${tag}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!--History log-->
         <div th:fragment="history-log" th:if="${!activities.isEmpty()}">
             <hr>

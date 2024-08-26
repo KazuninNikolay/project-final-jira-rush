@@ -47,7 +47,24 @@
         <div th:replace="~{::inputField(labelText='Estimate', fieldName='estimate', inputType='number')}"></div>
         <hr>
 
-        <!--Comments-->
+        <!-- Tags -->
+        <div class="form-group">
+            <label class="col-form-label" for="tags">Tags</label>
+            <div id="tag-container">
+                <div th:each="tag : ${task.tags}">
+                    <span class="badge bg-secondary">
+                        <span th:text="${tag}">Tag</span>
+                        <a href="#" class="text-danger ms-1" onclick="deleteTag([[${tag}]])">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <input type="text" id="tag-input" class="form-control w-25 mt-2" placeholder="Add a tag">
+            <button type="button" class="btn btn-primary mt-2" onclick="addTag()">Add Tag</button>
+        </div>
+
+        <!-- Comments -->
         <div class="row d-flex align-items-center mb-2" th:if="${!task.isNew()}">
             <div class="col">
                 <span class="h5 fw-bold text-secondary ms-1">Comments</span>
@@ -85,12 +102,12 @@
             </div>
         </div>
 
-        <!--History log-->
+        <!-- History log -->
         <history th:if="${!task.isNew()}">
             <div th:replace="~{/task :: history-log}"></div>
         </history>
 
-        <!--Comment modal-->
+        <!-- Comment modal -->
         <div class="modal" id="comment-modal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -111,7 +128,54 @@
     const objectId = [[${task.id}]];
     const objectType = "TASK";
     const authUserId = [[${authUser.id}]];
+
+    function addTag() {
+        const tagInput = document.getElementById("tag-input");
+        const tag = tagInput.value.trim();
+        if (tag) {
+            fetch(`/api/tasks/${taskId}/tags`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tag })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const tagContainer = document.getElementById("tag-container");
+                    const newTag = document.createElement("div");
+                    newTag.innerHTML = `
+                    <span class="badge bg-secondary">
+                        <span>${data.tag}</span>
+                        <a href="#" class="text-danger ms-1" onclick="deleteTag('${data.tag}')">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </span>
+                `;
+                    tagContainer.appendChild(newTag);
+                    tagInput.value = '';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+
+    function deleteTag(tag) {
+        fetch(`/api/tasks/${taskId}/tags/${tag}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response.ok) {
+                    const tagContainer = document.getElementById("tag-container");
+                    const tagElement = tagContainer.querySelector(`span:contains('${tag}')`);
+                    if (tagElement) {
+                        tagContainer.removeChild(tagElement.parentElement);
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
 </script>
 <script src="/static/js/common.js"></script>
 <script src="/static/js/attachments.js"></script>
 <script src="/static/js/activity.js"></script>
+</html>
